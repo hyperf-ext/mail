@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of hyperf-ext/mail.
+ *
+ * @link     https://github.com/hyperf-ext/mail
+ * @contact  eric@zhu.email
+ * @license  https://github.com/hyperf-ext/mail/blob/master/LICENSE
+ */
+namespace %NAMESPACE%;
+
+use HyperfExt\Mail\Contracts\ShouldQueueInterface;
+use HyperfExt\Mail\Mailable;
+
+class %CLASS% extends Mailable implements ShouldQueueInterface
+{
+    /**
+     * Create a new message instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Build the message.
+     */
+    public function build(): void
+    {
+        $this->htmlView('view.name');
+    }
+}
