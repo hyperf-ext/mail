@@ -15,7 +15,7 @@ interface MailableInterface
     /**
      * Set the sender of the message.
      *
-     * @param \HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param \HyperfExt\Contract\HasMailAddress|string $address
      *
      * @return $this
      */
@@ -24,7 +24,7 @@ interface MailableInterface
     /**
      * Set the "reply to" address of the message.
      *
-     * @param \HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param \HyperfExt\Contract\HasMailAddress|string $address
      *
      * @return $this
      */
@@ -33,7 +33,7 @@ interface MailableInterface
     /**
      * Add the recipient of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
      *
      * @return $this
      */
@@ -42,14 +42,14 @@ interface MailableInterface
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param \HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
     public function hasCc($address, ?string $name = null): bool;
 
     /**
      * Add the recipients of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
      *
      * @return $this
      */
@@ -58,14 +58,14 @@ interface MailableInterface
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param \HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
     public function hasBcc($address, ?string $name = null): bool;
 
     /**
      * Add the recipients of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
      *
      * @return $this
      */
@@ -74,7 +74,7 @@ interface MailableInterface
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param \HyperfExt\Mail\Contracts\HasMailAddressInterface|string $address
+     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
     public function hasTo($address, ?string $name = null): bool;
 

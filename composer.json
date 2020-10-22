@@ -32,6 +32,7 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ext-swoole": ">=4.5",
+        "hyperf-ext/contract": "^2.0",
         "hyperf/async-queue": "^2.0",
         "hyperf/command": "^2.0",
         "hyperf/config": "^2.0",
@@ -40,7 +41,6 @@
         "hyperf/event": "^2.0",
         "hyperf/filesystem": "^2.0",
         "hyperf/framework": "^2.0",
-        "hyperf/guzzle": "^2.0",
         "hyperf/translation": "^2.0",
         "hyperf/view": "^2.0",
         "swiftmailer/swiftmailer": "^6.0"

@@ -10,10 +10,10 @@ declare(strict_types=1);
  */
 namespace %NAMESPACE%;
 
-use HyperfExt\Mail\Contracts\ShouldQueueInterface;
+use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Mailable;
 
-class %CLASS% extends Mailable implements ShouldQueueInterface
+class %CLASS% extends Mailable implements ShouldQueue
 {
     /**
      * Create a new message instance.

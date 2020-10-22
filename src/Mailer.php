@@ -11,10 +11,10 @@ declare(strict_types=1);
 namespace HyperfExt\Mail;
 
 use Hyperf\Utils\Traits\Macroable;
+use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Concerns\PendingMailable;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailerInterface;
-use HyperfExt\Mail\Contracts\ShouldQueueInterface;
 use HyperfExt\Mail\Events\MessageSending;
 use HyperfExt\Mail\Events\MessageSent;
 use Psr\Container\ContainerInterface;
@@ -189,7 +189,7 @@ class Mailer implements MailerInterface
 
     public function send(MailableInterface $mailable)
     {
-        return $mailable instanceof ShouldQueueInterface
+        return $mailable instanceof ShouldQueue
             ? $mailable->mailer($this->name)->queue()
             : $mailable->mailer($this->name)->send($this);
     }

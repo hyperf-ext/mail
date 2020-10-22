@@ -503,7 +503,7 @@ public function build()
 
 ## 发送邮件
 
-若要发送邮件，使用 `Mail` 辅助类的 `to` 方法。`to` 方法接受邮件地址、邮件地址数组以及实现 `HasMailAddressInterface` 接口的实例或实例集合。如果传递一个邮件地址数组，那么它必须是包含字符串地址的一位数组或是包含具有 `email` 和 `name` 键的数组的二维数组，mailer 在设置收件人时会自动设置。一旦指定了收件人，就可以将 `Mailable` 类实例传递给 `send` 方法：
+若要发送邮件，使用 `Mail` 辅助类的 `to` 方法。`to` 方法接受邮件地址、邮件地址数组以及实现 `HyperfExt/Contract/HasMailAddress` 接口的实例或实例集合。如果传递一个邮件地址数组，那么它必须是包含字符串地址的一位数组或是包含具有 `email` 和 `name` 键的数组的二维数组，mailer 在设置收件人时会自动设置。一旦指定了收件人，就可以将 `Mailable` 类实例传递给 `send` 方法：
 
 ```php
 <?php
@@ -598,13 +598,13 @@ Mail::to($request->user())
 
 #### 默认使用队列
 
-如果你希望你的邮件类始终使用队列，您可以给邮件类 `HyperfExt\Mail\Contracts\ShouldQueueInterface` 接口，现在即使你调用了 `send` 方法，邮件依旧使用队列的方式发送。另外，如果需要将邮件推送到指定队列，可以设置在邮件类中设置 `queue` 属性。
+如果你希望你的邮件类始终使用队列，您可以给邮件类 `HyperfExt\Contract\ShouldQueue` 接口，现在即使你调用了 `send` 方法，邮件依旧使用队列的方式发送。另外，如果需要将邮件推送到指定队列，可以设置在邮件类中设置 `queue` 属性。
 
 ```php
-use HyperfExt\Mail\Contracts\ShouldQueueInterface;
+use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Mailable;
 
-class OrderShipped extends Mailable implements ShouldQueueInterface
+class OrderShipped extends Mailable implements ShouldQueue
 {
     /**
      * 列队名称。
@@ -656,7 +656,7 @@ Mail::to($request->user())->locale('es')->send(
 
 ### 用户的个性化翻译
 
-有时，应用程序会为每个用户存储不同的区域设置。通过在一个或多个模型上实现 `getPreferredLocale(): string` 方法，可以指示组件在发送邮件时使用此存储的区域设置:
+有时，应用程序会为每个用户存储不同的区域设置。通过在一个或多个模型上实现 `HyperfExt/Contract/HasLocalePreference` 接口，可以指示组件在发送邮件时使用此存储的区域设置:
 
 ```php
 class User extends Model

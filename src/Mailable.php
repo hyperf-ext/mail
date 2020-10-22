@@ -22,7 +22,7 @@ use Hyperf\Utils\Coroutine;
 use Hyperf\Utils\Str;
 use Hyperf\Utils\Traits\ForwardsCalls;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Mail\Contracts\HasMailAddressInterface;
+use HyperfExt\Contract\HasMailAddress;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailerInterface;
 use HyperfExt\Mail\Contracts\MailManagerInterface;
@@ -489,7 +489,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
                         'address' => $item['address'],
                         'name' => $item['name'] ?? null,
                     ];
-                } elseif (is_string($item) or $item instanceof HasMailAddressInterface) {
+                } elseif (is_string($item) or $item instanceof HasMailAddress) {
                     $addresses[] = $this->normalizeRecipient($item);
                 }
             }
@@ -502,11 +502,11 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
     /**
      * Convert the given recipient into an object.
      *
-     * @param HasMailAddressInterface|string $address
+     * @param HasMailAddress|string $address
      */
     protected function normalizeRecipient($address, ?string $name = null): array
     {
-        if ($address instanceof HasMailAddressInterface) {
+        if ($address instanceof HasMailAddress) {
             $name = $address->getMailAddressDisplayName();
             $address = $address->getMailAddress();
         }

@@ -14,11 +14,11 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Utils\Arr;
 use Hyperf\Utils\Str;
+use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Concerns\PendingMailable;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailerInterface;
 use HyperfExt\Mail\Contracts\MailManagerInterface;
-use HyperfExt\Mail\Contracts\ShouldQueueInterface;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Swift_DependencyContainer;
@@ -100,7 +100,7 @@ class MailManager implements MailManagerInterface
      */
     public function send(MailableInterface $mailable)
     {
-        return $mailable instanceof ShouldQueueInterface
+        return $mailable instanceof ShouldQueue
             ? $mailable->queue()
             : $mailable->send($this);
     }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace HyperfExt\Mail;
 
 use Hyperf\Utils\ApplicationContext;
+use HyperfExt\Contract\HasLocalePreference;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailManagerInterface;
 
@@ -85,7 +86,7 @@ class PendingMail
 
         if (! $this->locale &&
             is_object($users) &&
-            method_exists($users, 'getPreferredLocale') &&
+            $users instanceof HasLocalePreference &&
             is_string($locale = $users->getPreferredLocale())
         ) {
             $this->locale($locale);
