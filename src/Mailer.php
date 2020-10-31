@@ -15,8 +15,8 @@ use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Concerns\PendingMailable;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailerInterface;
-use HyperfExt\Mail\Events\MessageSending;
-use HyperfExt\Mail\Events\MessageSent;
+use HyperfExt\Mail\Events\MailMessageSending;
+use HyperfExt\Mail\Events\MailMessageSent;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Swift_Mailer;
@@ -178,11 +178,11 @@ class Mailer implements MailerInterface
         // its recipients. We will then fire the sent event for the sent message.
         $swiftMessage = $message->getSwiftMessage();
 
-        $this->eventDispatcher->dispatch(new MessageSending($swiftMessage, $data));
+        $this->eventDispatcher->dispatch(new MailMessageSending($swiftMessage, $data));
 
         $this->sendSwiftMessage($swiftMessage, $failedRecipients);
 
-        $this->eventDispatcher->dispatch(new MessageSent($swiftMessage, $data));
+        $this->eventDispatcher->dispatch(new MailMessageSent($swiftMessage, $data));
 
         return $failedRecipients;
     }

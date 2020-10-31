@@ -706,4 +706,4 @@ Mail::to($request->user())->send(new OrderShipped($order));
 <a name="events"></a>
 ## 事件
 
-在发送邮件消息的时候，组件会触发两个事件。`MessageSending` 事件在发送消息前触发，`MessageSent` 事件在消息发送完成后触发。记住，这些事件都是在邮件被**发送**时触发，而不是在队列化的时候。
+在发送邮件消息的时候，组件会触发两个事件。`MailMessageSending` 事件在发送消息前触发，`MailMessageSent` 事件在消息发送完成后触发。记住，这些事件都是在邮件被**发送**时触发，而不是在队列化的时候。

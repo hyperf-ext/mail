@@ -13,7 +13,7 @@ namespace HyperfExt\Mail\Events;
 use Swift_Attachment;
 use Swift_Message;
 
-class MessageSent
+class MailMessageSent
 {
     /**
      * The Swift message instance.

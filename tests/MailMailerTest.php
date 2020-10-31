@@ -12,8 +12,8 @@ namespace HyperfTest\Mail;
 
 use Hyperf\Utils\ApplicationContext;
 use HyperfExt\Mail\Contracts\MailableInterface;
-use HyperfExt\Mail\Events\MessageSending;
-use HyperfExt\Mail\Events\MessageSent;
+use HyperfExt\Mail\Events\MailMessageSending;
+use HyperfExt\Mail\Events\MailMessageSent;
 use HyperfExt\Mail\Mailer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -39,8 +39,8 @@ class MailMailerTest extends TestCase
         $mailable = m::mock(MailableInterface::class);
         $mailable->shouldReceive('handler')->once()->andReturn(null);
         $events = ApplicationContext::getContainer()->get(EventDispatcherInterface::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
         $mailer = $this->getMailer();
         $this->setSwiftMailer($mailer);
         $mailer->setAlwaysFrom('eric@zhu.email', 'Taylor Otwell');
@@ -56,8 +56,8 @@ class MailMailerTest extends TestCase
         $mailable = m::mock(MailableInterface::class);
         $mailable->shouldReceive('handler')->once()->andReturn(null);
         $events = ApplicationContext::getContainer()->get(EventDispatcherInterface::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
         $mailer = $this->getMailer();
         $this->setSwiftMailer($mailer);
         $mailer->setAlwaysReturnPath('eric@zhu.email');
@@ -73,8 +73,8 @@ class MailMailerTest extends TestCase
         $mailable = m::mock(MailableInterface::class);
         $mailable->shouldReceive('handler')->once()->andReturn(null);
         $events = ApplicationContext::getContainer()->get(EventDispatcherInterface::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
         $mailer = $this->getMailer();
         $mailer->getSwiftMailer()->shouldReceive('getTransport')->andReturn($transport = m::mock(Swift_Transport::class));
         $transport->shouldReceive('stop');
@@ -93,8 +93,8 @@ class MailMailerTest extends TestCase
         $mailable = m::mock(MailableInterface::class);
         $mailable->shouldReceive('handler')->once()->andReturn(null);
         $events = ApplicationContext::getContainer()->get(EventDispatcherInterface::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
         $mailer = $this->getMailer($events);
         $this->setSwiftMailer($mailer);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), []);

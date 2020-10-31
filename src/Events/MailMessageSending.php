@@ -12,7 +12,7 @@ namespace HyperfExt\Mail\Events;
 
 use Swift_Message;
 
-class MessageSending
+class MailMessageSending
 {
     /**
      * The Swift message instance.
