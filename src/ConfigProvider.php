@@ -29,7 +29,7 @@ class ConfigProvider
             'publish' => [
                 [
                     'id' => 'config',
-                    'description' => 'The config for HyperfExt\\Mail.',
+                    'description' => 'The config for hyperf-ext/mail.',
                     'source' => __DIR__ . '/../publish/mail.php',
                     'destination' => BASE_PATH . '/config/autoload/mail.php',
                 ],
