@@ -32,22 +32,22 @@
         "php": ">=7.3",
         "ext-json": "*",
         "ext-swoole": ">=4.5",
-        "hyperf-ext/contract": "~2.1.0",
-        "hyperf/async-queue": "~2.1.0",
-        "hyperf/command": "~2.1.0",
-        "hyperf/config": "~2.1.0",
-        "hyperf/devtool": "~2.1.0",
-        "hyperf/di": "~2.1.0",
-        "hyperf/event": "~2.1.0",
-        "hyperf/filesystem": "~2.1.0",
-        "hyperf/framework": "~2.1.0",
-        "hyperf/translation": "~2.1.0",
-        "hyperf/view": "~2.1.0",
-        "swiftmailer/swiftmailer": "^6.0"
+        "hyperf-ext/contract": "~2.2.0",
+        "hyperf/async-queue": "~2.2.0",
+        "hyperf/command": "~2.2.0",
+        "hyperf/config": "~2.2.0",
+        "hyperf/devtool": "~2.2.0",
+        "hyperf/di": "~2.2.0",
+        "hyperf/event": "~2.2.0",
+        "hyperf/filesystem": "~2.2.0",
+        "hyperf/framework": "~2.2.0",
+        "hyperf/translation": "~2.2.0",
+        "hyperf/view": "~2.2.0",
+        "swiftmailer/swiftmailer": "^6.2"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.14",
-        "hyperf/testing": "~2.1.0",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "hyperf/testing": "~2.2.0",
         "phpstan/phpstan": "^0.12",
         "swoole/ide-helper": "dev-master",
         "mockery/mockery": "^1.0"
@@ -62,7 +62,7 @@
         "sort-packages": true
     },
     "scripts": {
-        "test": "co-phpunit -c phpunit.xml --colors=always",
+        "test": "co-phpunit --prepend tests/bootstrap.php -c phpunit.xml --colors=always",
         "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
         "cs-fix": "php-cs-fixer fix $1"
     },
