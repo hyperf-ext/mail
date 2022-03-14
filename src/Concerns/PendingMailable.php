@@ -10,6 +10,8 @@ declare(strict_types=1);
  */
 namespace HyperfExt\Mail\Concerns;
 
+use Hyperf\Utils\Collection;
+use HyperfExt\Contract\HasMailAddress;
 use HyperfExt\Mail\PendingMail;
 
 trait PendingMailable
@@ -17,9 +19,9 @@ trait PendingMailable
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param mixed $users
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    public function to($users): PendingMail
+    public function to(array|Collection|HasMailAddress|string $users): PendingMail
     {
         return (new PendingMail($this))->to($users);
     }
@@ -27,9 +29,9 @@ trait PendingMailable
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param mixed $users
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    public function cc($users): PendingMail
+    public function cc(array|Collection|HasMailAddress $users): PendingMail
     {
         return (new PendingMail($this))->cc($users);
     }
@@ -37,9 +39,9 @@ trait PendingMailable
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param mixed $users
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    public function bcc($users): PendingMail
+    public function bcc(array|Collection|HasMailAddress $users): PendingMail
     {
         return (new PendingMail($this))->bcc($users);
     }

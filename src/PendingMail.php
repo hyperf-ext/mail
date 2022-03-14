@@ -11,63 +11,48 @@ declare(strict_types=1);
 namespace HyperfExt\Mail;
 
 use Hyperf\Utils\ApplicationContext;
+use Hyperf\Utils\Collection;
 use HyperfExt\Contract\HasLocalePreference;
+use HyperfExt\Contract\HasMailAddress;
 use HyperfExt\Mail\Contracts\MailableInterface;
 use HyperfExt\Mail\Contracts\MailManagerInterface;
 
 class PendingMail
 {
     /**
-     * The mailer instance.
-     *
-     * @var \HyperfExt\Mail\Mailer|\HyperfExt\Mail\MailManager
-     */
-    protected $mailer;
-
-    /**
      * The locale of the message.
-     *
-     * @var string
      */
-    protected $locale;
+    protected string $locale;
 
     /**
      * The "to" recipients of the message.
-     *
-     * @var array
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    protected $to = [];
+    protected array|Collection|HasMailAddress|string $to = [];
 
     /**
      * The "cc" recipients of the message.
-     *
-     * @var array
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    protected $cc = [];
+    protected array|Collection|HasMailAddress|string $cc = [];
 
     /**
      * The "bcc" recipients of the message.
-     *
-     * @var array
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $users
      */
-    protected $bcc = [];
+    protected array|Collection|HasMailAddress|string $bcc = [];
 
     /**
      * Create a new mailable mailer instance.
-     *
-     * @param \HyperfExt\Mail\Contracts\MailerInterface|\HyperfExt\Mail\Contracts\MailManagerInterface $mailer
      */
-    public function __construct($mailer)
+    public function __construct(protected MailManagerInterface|Contracts\MailerInterface $mailer)
     {
-        $this->mailer = $mailer;
     }
 
     /**
      * Set the locale of the message.
-     *
-     * @return $this
      */
-    public function locale(string $locale)
+    public function locale(string $locale): self
     {
         $this->locale = $locale;
 
@@ -76,18 +61,14 @@ class PendingMail
 
     /**
      * Set the recipients of the message.
-     *
-     * @param mixed $users
-     * @return $this
      */
-    public function to($users)
+    public function to(array|Collection|HasMailAddress|string $users): self
     {
         $this->to = $users;
 
-        if (! $this->locale &&
-            is_object($users) &&
-            $users instanceof HasLocalePreference &&
-            is_string($locale = $users->getPreferredLocale())
+        if (empty($this->locale)
+            && $users instanceof HasLocalePreference
+            && is_string($locale = $users->getPreferredLocale())
         ) {
             $this->locale($locale);
         }
@@ -97,11 +78,8 @@ class PendingMail
 
     /**
      * Set the recipients of the message.
-     *
-     * @param mixed $users
-     * @return $this
      */
-    public function cc($users)
+    public function cc(array|Collection|HasMailAddress|string $users): self
     {
         $this->cc = $users;
 
@@ -110,11 +88,8 @@ class PendingMail
 
     /**
      * Set the recipients of the message.
-     *
-     * @param mixed $users
-     * @return $this
      */
-    public function bcc($users)
+    public function bcc(array|Collection|HasMailAddress|string $users): self
     {
         $this->bcc = $users;
 
@@ -123,10 +98,8 @@ class PendingMail
 
     /**
      * Set the mailer of the message.
-     *
-     * @return $this
      */
-    public function mailer(string $name)
+    public function mailer(string $name): self
     {
         $this->mailer = ApplicationContext::getContainer()->get(MailManagerInterface::class)->get($name);
 
@@ -144,9 +117,9 @@ class PendingMail
     /**
      * Send a new mailable message instance.
      */
-    public function send(MailableInterface $mailable): array
+    public function send(MailableInterface $mailable): void
     {
-        return $this->mailer->send($this->fill($mailable));
+        $this->mailer->send($this->fill($mailable));
     }
 
     /**
@@ -173,7 +146,7 @@ class PendingMail
         return tap($mailable->to($this->to)
             ->cc($this->cc)
             ->bcc($this->bcc), function (MailableInterface $mailable) {
-                if ($this->locale) {
+                if (!empty($this->locale)) {
                     $mailable->locale($this->locale);
                 }
             });

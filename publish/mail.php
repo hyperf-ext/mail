@@ -39,63 +39,43 @@ return [
 
     'mailers' => [
         'smtp' => [
-            'transport' => \HyperfExt\Mail\Transport\SmtpTransport::class,
-            'options' => [
-                'host' => env('MAIL_SMTP_HOST', 'smtp.mailgun.org'),
-                'port' => env('MAIL_SMTP_PORT', 587),
-                'encryption' => env('MAIL_SMTP_ENCRYPTION', 'tls'),
-                'username' => env('MAIL_SMTP_USERNAME'),
-                'password' => env('MAIL_SMTP_PASSWORD'),
-                'timeout' => env('MAIL_SMTP_TIMEOUT'),
-                'auth_mode' => env('MAIL_SMTP_AUTH_MODE'),
-            ],
+            // smtp://user:pass@smtp.example.com:port
+            'dsn' => env('MAIL_SMTP_DSN'),
         ],
 
         'aws_ses' => [
-            'transport' => \HyperfExt\Mail\Transport\AwsSesTransport::class,
-            'options' => [
-                'credentials' => [
-                    'key' => env('MAIL_AWS_SES_ACCESS_KEY_ID'),
-                    'secret' => env('MAIL_AWS_SES_SECRET_ACCESS_KEY'),
-                ],
-                'region' => env('MAIL_AWS_SES_REGION'),
-            ],
+            // ses+smtp://USERNAME:PASSWORD@default
+            // ses+https://ACCESS_KEY:SECRET_KEY@default
+            // ses+api://ACCESS_KEY:SECRET_KEY@default
+            'dsn' => env('MAIL_AWS_SES_DSN'),
         ],
 
-        'aliyun_dm' => [
-            'transport' => \HyperfExt\Mail\Transport\AliyunDmTransport::class,
-            'options' => [
-                'access_key_id' => env('MAIL_ALIYUN_DM_ACCESS_KEY_ID'),
-                'access_secret' => env('MAIL_ALIYUN_DM_ACCESS_SECRET'),
-                'region_id' => env('MAIL_ALIYUN_DM_REGION_ID'),
-                'click_trace' => env('MAIL_ALIYUN_DM_CLICK_TRACE', '0'),
-            ],
+        'mandrill' => [
+            // mandrill+smtp://USERNAME:PASSWORD@default
+            // mandrill+https://KEY@default
+            // mandrill+api://KEY@default
+            'dsn' => env('MAIL_MANDRILL_DSN'),
         ],
 
         'mailgun' => [
-            'transport' => \HyperfExt\Mail\Transport\MailgunTransport::class,
-            'options' => [
-                'domain' => env('MAIL_MAILGUN_DOMAIN'),
-                'key' => env('MAIL_MAILGUN_KEY'),
-                'endpoint' => env('MAIL_MAILGUN_ENDPOINT', 'api.mailgun.net'),
-            ],
+            // mailgun+smtp://USERNAME:PASSWORD@default
+            // mailgun+https://KEY:DOMAIN@default
+            // mailgun+api://KEY:DOMAIN@default
+            'dsn' => env('MAIL_MAILGUN_DSN'),
         ],
 
         'postmark' => [
-            'transport' => \HyperfExt\Mail\Transport\PostmarkTransport::class,
-            'options' => [
-                'token' => env('MAIL_POSTMARK_TOKEN'),
-            ],
+            // postmark+smtp://ID@default
+            // postmark+api://KEY@default
+            'dsn' => env('MAIL_POSTMARK_DSN'),
         ],
 
         'sendmail' => [
-            'transport' => \HyperfExt\Mail\Transport\SendmailTransport::class,
-            'options' => [
-                'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs'),
-            ],
+            'dsn' => 'sendmail://default',
         ],
 
         'log' => [
+            'dsn' => 'log://',
             'transport' => \HyperfExt\Mail\Transport\LogTransport::class,
             'options' => [
                 'name' => 'mail.local',

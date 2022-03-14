@@ -10,175 +10,128 @@ declare(strict_types=1);
  */
 namespace HyperfExt\Mail\Contracts;
 
+use Hyperf\Utils\Collection;
+use HyperfExt\Contract\HasMailAddress;
+
 interface MailableInterface
 {
     /**
      * Set the sender of the message.
-     *
-     * @param \HyperfExt\Contract\HasMailAddress|string $address
-     *
-     * @return $this
      */
-    public function from($address, ?string $name = null);
+    public function from(string|HasMailAddress $address, ?string $name = null): self;
 
     /**
      * Set the "reply to" address of the message.
-     *
-     * @param \HyperfExt\Contract\HasMailAddress|string $address
-     *
-     * @return $this
      */
-    public function replyTo($address, ?string $name = null);
+    public function replyTo(string|HasMailAddress $address, ?string $name = null): self;
 
     /**
      * Add the recipient of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
-     *
-     * @return $this
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $address
      */
-    public function cc($address, ?string $name = null);
+    public function cc(array|Collection|HasMailAddress|string $address, ?string $name = null): self;
 
     /**
      * Determine if the given recipient is set on the mailable.
-     *
-     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
-    public function hasCc($address, ?string $name = null): bool;
+    public function hasCc(string|HasMailAddress $address, ?string $name = null): bool;
 
     /**
      * Add the recipients of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
-     *
-     * @return $this
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $address
      */
-    public function bcc($address, ?string $name = null);
+    public function bcc(array|Collection|HasMailAddress|string $address, ?string $name = null): self;
 
     /**
      * Determine if the given recipient is set on the mailable.
-     *
-     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
-    public function hasBcc($address, ?string $name = null): bool;
+    public function hasBcc(string|HasMailAddress $address, ?string $name = null): bool;
 
     /**
      * Add the recipients of the message.
      *
-     * @param array|\Hyperf\Utils\Collection|\HyperfExt\Contract\HasMailAddress|string $address
-     *
-     * @return $this
+     * @param Collection|HasMailAddress|HasMailAddress[]|string|string[] $address
      */
-    public function to($address, ?string $name = null);
+    public function to(array|Collection|HasMailAddress|string $address, ?string $name = null): self;
 
     /**
      * Determine if the given recipient is set on the mailable.
-     *
-     * @param \HyperfExt\Contract\HasMailAddress|string $address
      */
-    public function hasTo($address, ?string $name = null): bool;
+    public function hasTo(string|HasMailAddress $address, ?string $name = null): bool;
 
     /**
      * Set the subject of the message.
-     *
-     * @return $this
      */
-    public function subject(string $subject);
+    public function subject(string $subject): self;
 
     /**
      * Set the priority of this message.
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
-     *
-     * @return $this
      */
-    public function priority(int $level);
+    public function priority(int $level): self;
 
     /**
      * Set the locale of the message.
-     *
-     * @return $this
      */
-    public function locale(string $locale);
+    public function locale(string $locale): self;
 
     /**
      * Set the name of the mailer that should be used to send the message.
-     *
-     * @return $this
      */
-    public function mailer(string $mailer);
+    public function mailer(string $mailer): self;
 
     /**
      * Set the html view template for the message.
-     *
-     * @return $this
      */
-    public function htmlView(string $template);
+    public function htmlView(string $template): self;
 
     /**
      * Set the plain text view template for the message.
-     *
-     * @return $this
      */
-    public function textView(string $template);
+    public function textView(string $template): self;
 
     /**
      * Set the view data for the message.
-     *
-     * @param array|string $key
-     * @param null|mixed $value
-     * @return $this
      */
-    public function with($key, $value = null);
+    public function with(array|string $key, mixed $value = null): self;
 
     /**
      * Set the rendered HTML content for the message.
-     *
-     * @return $this
      */
-    public function htmlBody(string $content);
+    public function htmlBody(string $content): self;
 
     /**
      * Set the rendered plain text content for the message.
-     *
-     * @return $this
      */
-    public function textBody(string $content);
+    public function textBody(string $content): self;
 
     /**
      * Attach a file to the message.
-     *
-     * @return $this
      */
-    public function attach(string $file, array $options = []);
+    public function attach(string $file, array $options = []): self;
 
     /**
      * Attach a file to the message from storage.
-     *
-     * @return $this
      */
-    public function attachFromStorage(?string $adapter, string $path, ?string $name = null, array $options = []);
+    public function attachFromStorage(?string $adapter, string $path, ?string $name = null, array $options = []): self;
 
     /**
      * Attach in-memory data as an attachment.
-     *
-     * @return $this
      */
-    public function attachData(string $data, string $name, array $options = []);
+    public function attachData(string $data, string $name, array $options = []): self;
 
     /**
      * Render the message as a view.
-     *
-     * @param null|\HyperfExt\Mail\Contracts\MailerInterface|\HyperfExt\Mail\Contracts\MailManagerInterface $mailer
      */
-    public function render($mailer = null): string;
+    public function render(null|MailerInterface|MailManagerInterface $mailer = null): string;
 
     /**
-     * Send the message using the given mailer and return failed recipients.
-     *
-     * @param null|\HyperfExt\Mail\Contracts\MailerInterface|\HyperfExt\Mail\Contracts\MailManagerInterface $mailer
+     * Send the message using the given mailer.
      */
-    public function send($mailer = null): array;
+    public function send(null|MailerInterface|MailManagerInterface $mailer = null): void;
 
     /**
      * Queue the message for sending.

@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Mail;
 
-use HyperfExt\Mail\Contracts\HasMailAddressInterface;
+use HyperfExt\Contract\HasMailAddress;
 use HyperfExt\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 
@@ -327,9 +327,9 @@ class MailMailableTest extends TestCase
 
 class WelcomeMailableStub extends Mailable
 {
-    public $framework = 'Hyperf';
+    public string $framework = 'Hyperf';
 
-    protected $version = '2.0';
+    protected string $version = '2.0';
 
     /**
      * Build the message.
@@ -341,7 +341,7 @@ class WelcomeMailableStub extends Mailable
     }
 }
 
-class MailableTestUserStub implements HasMailAddressInterface
+class MailableTestUserStub implements HasMailAddress
 {
     public function getMailAddress(): string
     {

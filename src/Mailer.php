@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 namespace HyperfExt\Mail;
 
-use Hyperf\Utils\Traits\Macroable;
+use Hyperf\Macroable\Macroable;
 use HyperfExt\Contract\ShouldQueue;
 use HyperfExt\Mail\Concerns\PendingMailable;
 use HyperfExt\Mail\Contracts\MailableInterface;
@@ -19,8 +19,8 @@ use HyperfExt\Mail\Events\MailMessageSending;
 use HyperfExt\Mail\Events\MailMessageSent;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Swift_Mailer;
-use Swift_Message;
+use Symfony\Component\Mailer\MailerInterface as SymfonyMailerInterface;
+use Symfony\Component\Mime\Email;
 
 class Mailer implements MailerInterface
 {
@@ -28,86 +28,50 @@ class Mailer implements MailerInterface
     use PendingMailable;
 
     /**
-     * The name that is configured for the mailer.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The Swift Mailer instance.
-     *
-     * @var \Swift_Mailer
-     */
-    protected $swift;
-
-    /**
      * The event dispatcher instance.
-     *
-     * @var null|\Psr\EventDispatcher\EventDispatcherInterface
      */
-    protected $eventDispatcher;
+    protected ?EventDispatcherInterface $eventDispatcher;
 
     /**
      * The global from address and name.
-     *
-     * @var array
      */
-    protected $from;
+    protected array $from;
 
     /**
      * The global reply-to address and name.
-     *
-     * @var array
      */
-    protected $replyTo;
+    protected array $replyTo;
 
     /**
      * The global return path address.
-     *
-     * @var array
      */
-    protected $returnPath;
+    protected array $returnPath;
 
     /**
      * The global to address and name.
-     *
-     * @var array
      */
-    protected $to;
+    protected array $to;
 
     /**
      * Array of failed recipients.
-     *
-     * @var array
      */
-    protected $failedRecipients = [];
-
-    /**
-     * @var \Psr\Container\ContainerInterface
-     */
-    protected $container;
+    protected array $failedRecipients = [];
 
     /**
      * Create a new Mailer instance.
      */
     public function __construct(
-        string $name,
-        Swift_Mailer $swift,
-        ContainerInterface $container
+        protected string $name,
+        protected SymfonyMailerInterface $mailer,
+        protected ContainerInterface $container,
     ) {
-        $this->name = $name;
-        $this->swift = $swift;
         $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
-        $this->container = $container;
     }
 
     /**
      * Set the global from address and name.
-     *
-     * @return $this
      */
-    public function setAlwaysFrom(string $address, ?string $name = null)
+    public function setAlwaysFrom(string $address, ?string $name = null): self
     {
         $this->from = compact('address', 'name');
 
@@ -116,10 +80,8 @@ class Mailer implements MailerInterface
 
     /**
      * Set the global reply-to address and name.
-     *
-     * @return $this
      */
-    public function setAlwaysReplyTo(string $address, ?string $name = null)
+    public function setAlwaysReplyTo(string $address, ?string $name = null): self
     {
         $this->replyTo = compact('address', 'name');
 
@@ -128,10 +90,8 @@ class Mailer implements MailerInterface
 
     /**
      * Set the global return path address.
-     *
-     * @return $this
      */
-    public function setAlwaysReturnPath(string $address)
+    public function setAlwaysReturnPath(string $address): self
     {
         $this->returnPath = compact('address');
 
@@ -140,10 +100,8 @@ class Mailer implements MailerInterface
 
     /**
      * Set the global to address and name.
-     *
-     * @return $this
      */
-    public function astAlwaysTo(string $address, ?string $name = null)
+    public function setAlwaysTo(string $address, ?string $name = null): self
     {
         $this->to = compact('address', 'name');
 
@@ -155,10 +113,10 @@ class Mailer implements MailerInterface
         $message = $this->createMessage();
         $mailable->handler($message);
 
-        return $message->getBody();
+        return $message->getBody()->toString();
     }
 
-    public function sendNow(MailableInterface $mailable): ?array
+    public function sendNow(MailableInterface $mailable): void
     {
         $message = $this->createMessage();
 
@@ -176,20 +134,18 @@ class Mailer implements MailerInterface
         // Next we will determine if the message should be sent. We give the developer
         // one final chance to stop this message and then we will send it to all of
         // its recipients. We will then fire the sent event for the sent message.
-        $swiftMessage = $message->getSwiftMessage();
+        $email = $message->getEmail();
 
-        $this->eventDispatcher->dispatch(new MailMessageSending($swiftMessage, $data));
+        $this->eventDispatcher->dispatch(new MailMessageSending($email, $data));
 
-        $this->sendSwiftMessage($swiftMessage, $failedRecipients);
+        $this->sendEmail($email);
 
-        $this->eventDispatcher->dispatch(new MailMessageSent($swiftMessage, $data));
-
-        return $failedRecipients;
+        $this->eventDispatcher->dispatch(new MailMessageSent($email, $data));
     }
 
-    public function send(MailableInterface $mailable)
+    public function send(MailableInterface $mailable): void
     {
-        return $mailable instanceof ShouldQueue
+        $mailable instanceof ShouldQueue
             ? $mailable->mailer($this->name)->queue()
             : $mailable->mailer($this->name)->send($this);
     }
@@ -205,25 +161,25 @@ class Mailer implements MailerInterface
     }
 
     /**
-     * Get the Swift Mailer instance.
+     * Get the Symfony Mailer instance.
      */
-    public function getSwiftMailer(): Swift_Mailer
+    public function getSymfonyMailer(): SymfonyMailerInterface
     {
-        return $this->swift;
+        return $this->mailer;
     }
 
     /**
-     * Set the Swift Mailer instance.
+     * Set the Symfony Mailer instance.
      */
-    public function setSwiftMailer(Swift_Mailer $swift)
+    public function setSymfonyMailer(SymfonyMailerInterface $mailer): void
     {
-        $this->swift = $swift;
+        $this->mailer = $mailer;
     }
 
     /**
      * Set the global "to" address on the given message.
      */
-    protected function setGlobalToAndRemoveCcAndBcc(Message $message)
+    protected function setGlobalToAndRemoveCcAndBcc(Message $message): void
     {
         $message->setTo($this->to['address'], $this->to['name']);
         $message->setCc(null, null, true);
@@ -235,7 +191,7 @@ class Mailer implements MailerInterface
      */
     protected function createMessage(): Message
     {
-        $message = new Message($this->swift->createMessage('message'));
+        $message = new Message(new Email());
 
         // If a global from address has been specified we will set it on every message
         // instance so the developer does not have to repeat themselves every time
@@ -259,14 +215,12 @@ class Mailer implements MailerInterface
     }
 
     /**
-     * Send a Swift Message instance.
+     * Send a Symfony Email instance.
      */
-    protected function sendSwiftMessage(Swift_Message $message, ?array &$failedRecipients = null): ?int
+    protected function sendEmail(Email $message): void
     {
-        $this->failedRecipients = [];
-
         try {
-            return $this->swift->send($message, $failedRecipients);
+            $this->mailer->send($message);
         } finally {
             $this->forceReconnection();
         }
@@ -279,6 +233,6 @@ class Mailer implements MailerInterface
      */
     protected function forceReconnection()
     {
-        $this->getSwiftMailer()->getTransport()->stop();
+        // TODO check if reconnect is required
     }
 }

@@ -12,17 +12,18 @@ namespace HyperfExt\Mail\Transport;
 
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
-use Swift_Mime_SimpleMessage;
-use Swift_Mime_SimpleMimeEntity;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 
-class LogTransport extends Transport
+class LogTransport implements TransportInterface
 {
     /**
      * The Logger instance.
-     *
-     * @var \Psr\Log\LoggerInterface
      */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
     /**
      * Create a new log transport instance.
@@ -35,43 +36,36 @@ class LogTransport extends Transport
         );
     }
 
+    public function __toString(): string
+    {
+        return 'log://';
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->beforeSendPerformed($message);
+        if ($message instanceof Email) {
+            $this->logger->debug($this->getMimeEntityString($message));
+        }
 
-        $this->logger->debug($this->getMimeEntityString($message));
-
-        $this->sendPerformed($message);
-
-        return $this->numberOfRecipients($message);
+        return $message;
     }
 
     /**
      * Get the logger for the LogTransport instance.
-     *
-     * @return \Psr\Log\LoggerInterface
      */
-    public function logger()
+    public function logger(): \Psr\Log\LoggerInterface
     {
         return $this->logger;
     }
 
     /**
-     * Get a loggable string out of a Swiftmailer entity.
-     *
-     * @return string
+     * Get a loggable string out of a Email entity.
      */
-    protected function getMimeEntityString(Swift_Mime_SimpleMimeEntity $entity)
+    protected function getMimeEntityString(Email $entity): string
     {
-        $string = (string) $entity->getHeaders() . PHP_EOL . $entity->getBody();
-
-        foreach ($entity->getChildren() as $children) {
-            $string .= PHP_EOL . PHP_EOL . $this->getMimeEntityString($children);
-        }
-
-        return $string;
+        return $entity->toString();
     }
 }

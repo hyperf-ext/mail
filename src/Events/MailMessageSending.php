@@ -10,28 +10,24 @@ declare(strict_types=1);
  */
 namespace HyperfExt\Mail\Events;
 
-use Swift_Message;
+use Symfony\Component\Mime\Email;
 
 class MailMessageSending
 {
     /**
      * The Swift message instance.
-     *
-     * @var \Swift_Message
      */
-    public $message;
+    public Email $message;
 
     /**
      * The message data.
-     *
-     * @var array
      */
-    public $data;
+    public array $data;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Swift_Message $message, array $data = [])
+    public function __construct(Email $message, array $data = [])
     {
         $this->data = $data;
         $this->message = $message;

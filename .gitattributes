@@ -1,2 +1,8 @@
 /tests export-ignore
 /.github export-ignore
+
+* text=auto
+* text eol=lf
+*.php text
+*.md text
+*.stub text
