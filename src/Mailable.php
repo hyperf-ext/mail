@@ -530,7 +530,9 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
     protected function buildAddresses(Message $message): self
     {
         foreach (['from', 'replyTo'] as $type) {
-            is_array($this->{$type}) && $message->{'set' . ucfirst($type)}($this->{$type}['address'], $this->{$type}['name']);
+            isset($this->{$type})
+            && is_array($this->{$type})
+            && $message->{'set' . ucfirst($type)}($this->{$type}['address'], $this->{$type}['name']);
         }
 
         foreach (['to', 'cc', 'bcc'] as $type) {

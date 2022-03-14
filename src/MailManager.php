@@ -142,8 +142,8 @@ class MailManager implements MailManagerInterface
         // Once we have created the mailer instance we will set a container instance
         // on the mailer. This allows us to resolve mailer classes via containers
         // for maximum testability on said classes instead of passing Closures.
-        $swift = $this->createSymfonyMailer($config);
-        $mailer = make(Mailer::class, compact('name', 'swift'));
+        $symfonyMailer = $this->createSymfonyMailer($config);
+        $mailer = make(Mailer::class, ['name' => $name, 'mailer' => $symfonyMailer]);
 
         // Next we will set all of the global addresses on this mailer, which allows
         // for easy unification of all "from" addresses as well as easy debugging

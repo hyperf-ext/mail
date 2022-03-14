@@ -66,7 +66,7 @@ class PendingMail
     {
         $this->to = $users;
 
-        if (! $this->locale
+        if (empty($this->locale)
             && $users instanceof HasLocalePreference
             && is_string($locale = $users->getPreferredLocale())
         ) {
@@ -117,9 +117,9 @@ class PendingMail
     /**
      * Send a new mailable message instance.
      */
-    public function send(MailableInterface $mailable): array
+    public function send(MailableInterface $mailable): void
     {
-        return $this->mailer->send($this->fill($mailable));
+        $this->mailer->send($this->fill($mailable));
     }
 
     /**
@@ -146,7 +146,7 @@ class PendingMail
         return tap($mailable->to($this->to)
             ->cc($this->cc)
             ->bcc($this->bcc), function (MailableInterface $mailable) {
-                if ($this->locale) {
+                if (!empty($this->locale)) {
                     $mailable->locale($this->locale);
                 }
             });
