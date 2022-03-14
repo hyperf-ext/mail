@@ -32,12 +32,12 @@ abstract class Mail
         return $instance->{$method}(...$args);
     }
 
-    public static function mailer(string $name)
+    public static function mailer(string $name): PendingMail
     {
         return new PendingMail(static::getManager()->get($name));
     }
 
-    protected static function getManager()
+    protected static function getManager(): MailManagerInterface
     {
         return ApplicationContext::getContainer()->get(MailManagerInterface::class);
     }

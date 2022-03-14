@@ -18,18 +18,14 @@ interface MailerInterface
     public function render(MailableInterface $mailable): string;
 
     /**
-     * Send a new message using a mailable instance and return failed recipients.
-     *
-     * @param callable|\Closure|\HyperfExt\Mail\Contracts\MailableInterface $mailable
+     * Send a new message using a mailable instance.
      */
-    public function sendNow(MailableInterface $mailable): ?array;
+    public function sendNow(MailableInterface $mailable): void;
 
     /**
-     * Send a new message using a mailable instance and return failed recipients.
-     *
-     * @param array|callable|\Closure|\HyperfExt\Mail\Contracts\MailableInterface $mailable
+     * Send a new message using a mailable instance.
      */
-    public function send(MailableInterface $mailable);
+    public function send(MailableInterface $mailable): void;
 
     /**
      * Queue a new e-mail message for sending.

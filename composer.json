@@ -16,6 +16,10 @@
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Volodymyr Mikhav",
+            "email": "mihaw.wolodymyr@gmail.com"
         }
     ],
     "autoload": {
@@ -29,7 +33,7 @@
         }
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=8.0",
         "ext-json": "*",
         "ext-swoole": ">=4.5",
         "hyperf-ext/contract": "~2.2.0",
@@ -43,7 +47,7 @@
         "hyperf/framework": "~2.2.0",
         "hyperf/translation": "~2.2.0",
         "hyperf/view": "~2.2.0",
-        "swiftmailer/swiftmailer": "^6.2"
+        "symfony/mailer": "^6.0.5"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -54,9 +58,15 @@
     },
     "suggest": {
         "hyperf/guzzle": "Required to use the mail driver (^2.0).",
-        "alibabacloud/dm": "Required to use the Aliyun (Alibaba Cloud) DM mail driver (^1.8).",
-        "aws/aws-sdk-php": "Required to use the AWS SES mail driver (^3.0).",
-        "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.3)."
+        "symfony/amazon-mailer": "Required to use the AWS SES mail driver.",
+        "symfony/google-mailer": "Required to use the Gmail mail driver.",
+        "symfony/mailchimp-mailer": "Required to use the Mailchimp mail driver.",
+        "symfony/mailgun-mailer": "Required to use the Mailgun mail driver.",
+        "symfony/mailjet-mailer": "Required to use the Mailjet mail driver.",
+        "symfony/postmark-mailer": "Required to use the Postmark mail driver.",
+        "symfony/sendgrid-mailer": "Required to use the SendGrid mail driver.",
+        "symfony/sendinblue-mailer": "Required to use the Sendinblue mail driver.",
+        "symfony/oh-my-smtp-mailer": "Required to use the OhMySMTP mail driver."
     },
     "config": {
         "sort-packages": true

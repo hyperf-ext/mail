@@ -21,43 +21,34 @@ use HyperfExt\Mail\Contracts\MailerInterface;
 use HyperfExt\Mail\Contracts\MailManagerInterface;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
-use Swift_DependencyContainer;
-use Swift_Mailer;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @mixin \HyperfExt\Mail\Mailer
+ * @mixin Mailer
  */
 class MailManager implements MailManagerInterface
 {
     use PendingMailable;
 
     /**
-     * The container instance.
-     *
-     * @var \Psr\Container\ContainerInterface
-     */
-    protected $container;
-
-    /**
      * The config instance.
-     *
-     * @var \Hyperf\Contract\ConfigInterface
      */
-    protected $config;
+    protected ConfigInterface $config;
 
     /**
      * The array of resolved mailers.
      *
-     * @var \HyperfExt\Mail\Mailer[]
+     * @var Mailer[]
      */
-    protected $mailers = [];
+    protected array $mailers = [];
 
     /**
      * Create a new Mail manager instance.
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
         $this->config = $container->get(ConfigInterface::class);
     }
 
@@ -95,40 +86,42 @@ class MailManager implements MailManagerInterface
 
     /**
      * Send the given mailable.
-     *
-     * @return mixed
      */
-    public function send(MailableInterface $mailable)
+    public function send(MailableInterface $mailable): void
     {
-        return $mailable instanceof ShouldQueue
+        $mailable instanceof ShouldQueue
             ? $mailable->queue()
             : $mailable->send($this);
     }
 
     /**
      * Create a new transport instance.
-     *
-     * @return \Swift_Transport
      */
-    protected function createTransport(array $config)
+    protected function createTransport(array $config): TransportInterface
     {
-        if (empty($config['transport'])) {
-            throw new InvalidArgumentException('The mail transport must be specified.');
+        if (empty($config['dsn'])) {
+            throw new InvalidArgumentException('The mail transport DSN must be specified.');
         }
 
-        if (! class_exists($config['transport'])) {
-            throw new InvalidArgumentException("Unsupported mail transport [{$config['transport']}].");
+        if ($config['dsn'] === 'log://') {
+            return make($config['transport'], ['options' => $config['options'] ?? []]);
         }
 
-        return make($config['transport'], ['options' => $config['options'] ?? []]);
+        $logger = null;
+        if (($loggerConfig = $this->config->get('mail.logger')) && $loggerConfig['enabled'] === true) {
+            $logger = $this->container->get(LoggerFactory::class)->get(
+                $loggerConfig['name'] ?? 'mail',
+                $loggerConfig['group'] ?? 'default'
+            );
+        }
+
+        return Transport::fromDsn($config['dsn'], null, null, $logger);
     }
 
     /**
      * Get the default mail driver name.
-     *
-     * @return string
      */
-    protected function getDefaultMailerName()
+    protected function getDefaultMailerName(): string
     {
         return $this->config->get('mail.default');
     }
@@ -149,7 +142,7 @@ class MailManager implements MailManagerInterface
         // Once we have created the mailer instance we will set a container instance
         // on the mailer. This allows us to resolve mailer classes via containers
         // for maximum testability on said classes instead of passing Closures.
-        $swift = $this->createSwiftMailer($config);
+        $swift = $this->createSymfonyMailer($config);
         $mailer = make(Mailer::class, compact('name', 'swift'));
 
         // Next we will set all of the global addresses on this mailer, which allows
@@ -163,30 +156,11 @@ class MailManager implements MailManagerInterface
     }
 
     /**
-     * Create the SwiftMailer instance for the given configuration.
-     *
-     * @return \Swift_Mailer
+     * Create the Symfony Mailer instance for the given configuration.
      */
-    protected function createSwiftMailer(array $config)
+    protected function createSymfonyMailer(array $config): SymfonyMailer
     {
-        if ($config['domain'] ?? false) {
-            Swift_DependencyContainer::getInstance()
-                ->register('mime.idgenerator.idright')
-                ->asValue($config['domain']);
-        }
-
-        $swift = new Swift_Mailer($this->createTransport($config));
-
-        if (($loggerConfig = $this->config->get('mail.logger')) && $loggerConfig['enabled'] === true) {
-            $swift->registerPlugin(new SwiftMailerLoggerPlugin(
-                $this->container->get(LoggerFactory::class)->get(
-                    $loggerConfig['name'] ?? 'mail',
-                    $loggerConfig['group'] ?? 'default'
-                )
-            ));
-        }
-
-        return $swift;
+        return new SymfonyMailer($this->createTransport($config));
     }
 
     /**
@@ -203,10 +177,8 @@ class MailManager implements MailManagerInterface
 
     /**
      * Get the mail connection configuration.
-     *
-     * @return array
      */
-    protected function getConfig(string $name)
+    protected function getConfig(string $name): array
     {
         return $this->config->get("mail.mailers.{$name}");
     }

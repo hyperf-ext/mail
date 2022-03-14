@@ -35,129 +35,95 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * The locale of the message.
-     *
-     * @var string
      */
-    public $locale;
+    public string $locale;
 
     /**
      * The person the message is from.
-     *
-     * @var array
      */
-    public $from;
+    public array $from;
 
     /**
      * The "to" recipients of the message.
-     *
-     * @var array
      */
-    public $to = [];
+    public array $to = [];
 
     /**
      * The "cc" recipients of the message.
-     *
-     * @var array
      */
-    public $cc = [];
+    public array $cc = [];
 
     /**
      * The "bcc" recipients of the message.
-     *
-     * @var array
      */
-    public $bcc = [];
+    public array $bcc = [];
 
     /**
      * The "reply to" recipients of the message.
-     *
-     * @var array
      */
-    public $replyTo;
+    public array $replyTo;
 
     /**
      * The subject of the message.
-     *
-     * @var string
      */
-    public $subject;
+    public string $subject;
 
     /**
      * The HTML view to use for the message.
-     *
-     * @var string
      */
-    public $htmlViewTemplate;
+    public string $htmlViewTemplate;
 
     /**
      * The plain text view to use for the message.
-     *
-     * @var string
      */
-    public $textViewTemplate;
+    public string $textViewTemplate;
 
     /**
      * The view data for the message.
-     *
-     * @var array
      */
-    public $viewData = [];
+    public array $viewData = [];
 
     /**
      * The HTML content to use for the message.
-     *
-     * @var string
      */
-    public $htmlBody;
+    public string $htmlBody;
 
     /**
      * The plain text content to use for the message.
-     *
-     * @var string
      */
-    public $textBody;
+    public string $textBody;
 
     /**
      * The attachments for the message.
-     *
-     * @var array
      */
-    public $attachments = [];
+    public array $attachments = [];
 
     /**
      * The raw attachments for the message.
-     *
-     * @var array
      */
-    public $rawAttachments = [];
+    public array $rawAttachments = [];
 
     /**
      * The attachments from a storage disk.
-     *
-     * @var array
      */
-    public $storageAttachments = [];
+    public array $storageAttachments = [];
 
     /**
      * The priority of this message.
-     *
-     * @var int
      */
-    public $priority = 3;
+    public int $priority = 3;
 
     /**
      * The name of the mailer that should send the message.
-     *
-     * @var string
      */
-    public $mailer;
+    public string $mailer;
 
     /**
      * The callbacks for the message.
      *
-     * @var \Closure[]
+     * @var Closure[]
      */
-    public $callbacks = [];
+    public array $callbacks = [];
 
     /**
      * The callback that should be invoked while building the view data.
@@ -166,21 +132,21 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
      */
     public static $viewDataCallback;
 
-    public function locale(string $locale)
+    public function locale(string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    public function priority(int $level)
+    public function priority(int $level): self
     {
         $this->priority = $level;
 
         return $this;
     }
 
-    public function from($address, ?string $name = null)
+    public function from(string|HasMailAddress $address, ?string $name = null): self
     {
         $this->from = $this->normalizeRecipient($address, $name);
 
@@ -192,7 +158,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $this->from == $this->normalizeRecipient($address, $name);
     }
 
-    public function replyTo($address, ?string $name = null)
+    public function replyTo(string|HasMailAddress $address, ?string $name = null): self
     {
         $this->replyTo = $this->normalizeRecipient($address, $name);
 
@@ -201,48 +167,47 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     public function hasReplyTo($address, ?string $name = null): bool
     {
-//        return $this->replyTo == $this->normalizeRecipient($address, $name);
         return $this->hasRecipient($address, $name, 'replyTo');
     }
 
-    public function to($address, ?string $name = null)
+    public function to($address, ?string $name = null): self
     {
         return $this->addRecipient($address, $name, 'to');
     }
 
-    public function hasTo($address, ?string $name = null): bool
+    public function hasTo(string|HasMailAddress $address, ?string $name = null): bool
     {
         return $this->hasRecipient($address, $name, 'to');
     }
 
-    public function cc($address, ?string $name = null)
+    public function cc(array|string|HasMailAddress|Collection $address, ?string $name = null): self
     {
         return $this->addRecipient($address, $name, 'cc');
     }
 
-    public function hasCc($address, ?string $name = null): bool
+    public function hasCc(string|HasMailAddress $address, ?string $name = null): bool
     {
         return $this->hasRecipient($address, $name, 'cc');
     }
 
-    public function bcc($address, ?string $name = null)
+    public function bcc($address, ?string $name = null): self
     {
         return $this->addRecipient($address, $name, 'bcc');
     }
 
-    public function hasBcc($address, ?string $name = null): bool
+    public function hasBcc(string|HasMailAddress $address, ?string $name = null): bool
     {
         return $this->hasRecipient($address, $name, 'bcc');
     }
 
-    public function subject(string $subject)
+    public function subject(string $subject): self
     {
         $this->subject = $subject;
 
         return $this;
     }
 
-    public function attach(string $file, array $options = [])
+    public function attach(string $file, array $options = []): self
     {
         $this->attachments = collect($this->attachments)
             ->push(compact('file', 'options'))
@@ -252,7 +217,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $this;
     }
 
-    public function attachFromStorage(?string $adapter, string $path, ?string $name = null, array $options = [])
+    public function attachFromStorage(?string $adapter, string $path, ?string $name = null, array $options = []): self
     {
         $this->storageAttachments = collect($this->storageAttachments)->push([
             'storage' => $adapter ?: config('file.default'),
@@ -268,15 +233,13 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Attach a file to the message from storage.
-     *
-     * @return $this
      */
-    public function attachFromDefaultStorage(string $path, ?string $name = null, array $options = [])
+    public function attachFromDefaultStorage(string $path, ?string $name = null, array $options = []): self
     {
         return $this->attachFromStorage(null, $path, $name, $options);
     }
 
-    public function attachData(string $data, string $name, array $options = [])
+    public function attachData(string $data, string $name, array $options = []): self
     {
         $this->rawAttachments = collect($this->rawAttachments)
             ->push(compact('data', 'name', 'options'))
@@ -287,7 +250,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $this;
     }
 
-    public function mailer(string $mailer)
+    public function mailer(string $mailer): self
     {
         $this->mailer = $mailer;
 
@@ -295,11 +258,9 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
     }
 
     /**
-     * Register a callback to be called with the Swift message instance.
-     *
-     * @return $this
+     * Register a callback to be called with the Email instance.
      */
-    public function withSwiftMessage(Closure $callback)
+    public function withEmail(Closure $callback): self
     {
         $this->callbacks[] = $callback;
 
@@ -314,21 +275,21 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         static::$viewDataCallback = $callback;
     }
 
-    public function htmlView(string $template)
+    public function htmlView(string $template): self
     {
         $this->htmlViewTemplate = $template;
 
         return $this;
     }
 
-    public function textView(string $template)
+    public function textView(string $template): self
     {
         $this->textViewTemplate = $template;
 
         return $this;
     }
 
-    public function with($key, $value = null)
+    public function with(array|string $key, mixed $value = null): self
     {
         if (is_array($key)) {
             $this->viewData = array_merge($this->viewData, $key);
@@ -339,21 +300,26 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $this;
     }
 
-    public function htmlBody(string $content)
+    public function htmlBody(string $content): self
     {
         $this->htmlBody = $content;
 
         return $this;
     }
 
-    public function textBody(string $content)
+    public function textBody(string $content): self
     {
         $this->textBody = $content;
 
         return $this;
     }
 
-    public function handler(Message $message)
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \League\Flysystem\FilesystemException
+     */
+    public function handler(Message $message): void
     {
         $mailable = clone $this;
 
@@ -378,11 +344,11 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $mailer->render($this);
     }
 
-    public function send($mailer = null): array
+    public function send($mailer = null): void
     {
         $mailer = $this->resolveMailer($mailer);
 
-        return $mailer->sendNow($this);
+        $mailer->sendNow($this);
     }
 
     public function queue(?string $queue = null): bool
@@ -399,10 +365,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return ApplicationContext::getContainer()->get(DriverFactory::class)->get($queue)->push($this->newQueuedJob(), $delay);
     }
 
-    /**
-     * @return static
-     */
-    public function uncompress(): CompressInterface
+    public function uncompress(): self
     {
         foreach ($this as $key => $value) {
             if ($value instanceof UnCompressInterface) {
@@ -413,10 +376,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function compress(): UnCompressInterface
+    public function compress(): self
     {
         foreach ($this as $key => $value) {
             if ($value instanceof CompressInterface) {
@@ -444,10 +404,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return $data;
     }
 
-    /**
-     * @param null|\HyperfExt\Mail\Contracts\MailerInterface|\HyperfExt\Mail\Contracts\MailManagerInterface $mailer
-     */
-    protected function resolveMailer($mailer = null): MailerInterface
+    protected function resolveMailer(null|MailerInterface|MailManagerInterface $mailer = null): MailerInterface
     {
         return empty($mailer)
             ? ApplicationContext::getContainer()->get(MailManagerInterface::class)->mailer($this->mailer)
@@ -462,13 +419,11 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
         return new QueuedMailableJob($this);
     }
 
-    /**
-     * @param array|Collection|string $address
-     *
-     * @return $this
-     */
-    protected function addRecipient($address, ?string $name = null, string $property = 'to')
-    {
+    protected function addRecipient(
+        array|Collection|HasMailAddress|string $address,
+        ?string $name = null,
+        string $property = 'to',
+    ): self {
         $this->{$property} = array_merge($this->{$property}, $this->arrayizeAddress($address, $name));
 
         return $this;
@@ -476,10 +431,8 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Convert the given recipient arguments to an array.
-     *
-     * @param array|Collection|string $address
      */
-    protected function arrayizeAddress($address, ?string $name = null): array
+    protected function arrayizeAddress(array|Collection|HasMailAddress|string $address, ?string $name = null): array
     {
         $addresses = [];
         if (is_array($address) or $address instanceof Collection) {
@@ -501,10 +454,8 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Convert the given recipient into an object.
-     *
-     * @param HasMailAddress|string $address
      */
-    protected function normalizeRecipient($address, ?string $name = null): array
+    protected function normalizeRecipient(HasMailAddress|string $address, ?string $name = null): array
     {
         if ($address instanceof HasMailAddress) {
             $name = $address->getMailAddressDisplayName();
@@ -516,11 +467,12 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Determine if the given recipient is set on the mailable.
-     *
-     * @param array|object|string $address
      */
-    protected function hasRecipient($address, ?string $name = null, string $property = 'to'): bool
-    {
+    protected function hasRecipient(
+        array|Collection|HasMailAddress|string $address,
+        ?string $name = null,
+        string $property = 'to',
+    ): bool {
         $expected = $this->arrayizeAddress($address, $name)[0];
 
         $expected = [
@@ -528,7 +480,9 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
             'address' => $expected['address'],
         ];
 
-        return collect(in_array($property, ['replyTo', 'from']) ? [$this->{$property}] : $this->{$property})->contains(function ($actual) use ($expected) {
+        return collect(
+            in_array($property, ['replyTo', 'from']) ? [$this->{$property}] : $this->{$property}
+        )->contains(function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
@@ -572,10 +526,8 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Add all of the addresses to the message.
-     *
-     * @return $this
      */
-    protected function buildAddresses(Message $message)
+    protected function buildAddresses(Message $message): self
     {
         foreach (['from', 'replyTo'] as $type) {
             is_array($this->{$type}) && $message->{'set' . ucfirst($type)}($this->{$type}['address'], $this->{$type}['name']);
@@ -592,10 +544,8 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Set the subject for the message.
-     *
-     * @return $this
      */
-    protected function buildSubject(Message $message)
+    protected function buildSubject(Message $message): self
     {
         if ($this->subject) {
             $message->setSubject($this->subject);
@@ -609,14 +559,15 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
     /**
      * Add all of the attachments to the message.
      *
-     * @throws \League\Flysystem\FileNotFoundException
-     *
+     * @throws \League\Flysystem\FilesystemException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      * @return $this
      */
-    protected function buildAttachments(Message $message)
+    protected function buildAttachments(Message $message): self
     {
         foreach ($this->attachments as $attachment) {
-            $message->attach($attachment['file'], $attachment['options']);
+            $message->attachFile($attachment['file'], $attachment['options']);
         }
 
         foreach ($this->rawAttachments as $attachment) {
@@ -634,7 +585,7 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
             $message->attachData(
                 $storage->read($attachment['path']),
                 $attachment['name'] ?? basename($attachment['path']),
-                array_merge(['mime' => $storage->getMimetype($attachment['path'])], $attachment['options'])
+                array_merge(['mime' => $storage->mimetype($attachment['path'])], $attachment['options'])
             );
         }
 
@@ -643,19 +594,19 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     /**
      * Add the content to a given message.
-     *
-     * @return $this
      */
-    protected function buildContents(Message $message, ?string $html, ?string $plain, array $data)
+    protected function buildContents(Message $message, ?string $html, ?string $plain, array $data): self
     {
         if (! empty($html)) {
-            $message->setBody($html, 'text/html');
+            $message->html($html);
         }
 
         if (! empty($plain)) {
-            $method = empty($html) ? 'setBody' : 'addPart';
-
-            $message->{$method}($plain ?: ' ', 'text/plain');
+            if (empty($html)) {
+                $message->text($plain);
+            } else {
+                $message->attach($plain, null, $plain);
+            }
         }
 
         $message->setData($data);
@@ -668,10 +619,10 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
      *
      * @return $this
      */
-    protected function runCallbacks(Message $message)
+    protected function runCallbacks(Message $message): self
     {
         foreach ($this->callbacks as $callback) {
-            $callback($message->getSwiftMessage());
+            $callback($message->getEmail());
         }
 
         return $this;

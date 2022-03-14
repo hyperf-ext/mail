@@ -18,9 +18,8 @@ use HyperfExt\Mail\Mailer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_Transport;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
+use Symfony\Component\Mime\Email;
 
 /**
  * @internal
@@ -44,7 +43,7 @@ class MailMailerTest extends TestCase
         $mailer = $this->getMailer();
         $this->setSwiftMailer($mailer);
         $mailer->setAlwaysFrom('eric@zhu.email', 'Taylor Otwell');
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+        $mailer->getSymfonyMailer()->shouldReceive('send')->once()->with(m::type(Email::class), null)->andReturnUsing(function ($message) {
             $this->assertEquals(['eric@zhu.email' => 'Taylor Otwell'], $message->getFrom());
         });
         $mailer->sendNow($mailable);
@@ -61,29 +60,10 @@ class MailMailerTest extends TestCase
         $mailer = $this->getMailer();
         $this->setSwiftMailer($mailer);
         $mailer->setAlwaysReturnPath('eric@zhu.email');
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+        $mailer->getSymfonyMailer()->shouldReceive('send')->once()->with(m::type(Email::class), null)->andReturnUsing(function ($message) {
             $this->assertSame('eric@zhu.email', $message->getReturnPath());
         });
         $mailer->sendNow($mailable);
-    }
-
-    public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
-    {
-        unset($_SERVER['__mailer.test']);
-        $mailable = m::mock(MailableInterface::class);
-        $mailable->shouldReceive('handler')->once()->andReturn(null);
-        $events = ApplicationContext::getContainer()->get(EventDispatcherInterface::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
-        $mailer = $this->getMailer();
-        $mailer->getSwiftMailer()->shouldReceive('getTransport')->andReturn($transport = m::mock(Swift_Transport::class));
-        $transport->shouldReceive('stop');
-        $swift = new FailingSwiftMailerStub($transport);
-        $mailer->setSwiftMailer($swift);
-
-        $failures = $mailer->sendNow($mailable);
-
-        $this->assertEquals(['eric@zhu.email'], $failures);
     }
 
     public function testEventsAreDispatched()
@@ -97,9 +77,7 @@ class MailMailerTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type(MailMessageSent::class));
         $mailer = $this->getMailer($events);
         $this->setSwiftMailer($mailer);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), []);
-
-        self::assertNull($mailer->sendNow($mailable));
+        $mailer->getSymfonyMailer()->shouldReceive('send')->once()->with(m::type(Email::class), null);
     }
 
     public function testMacroable()
@@ -118,43 +96,19 @@ class MailMailerTest extends TestCase
 
     public function setSwiftMailer($mailer)
     {
-        $swift = m::mock(Swift_Mailer::class);
-        $swift->shouldReceive('createMessage')->andReturn(new Swift_Message());
-        $swift->shouldReceive('getTransport')->andReturn($transport = m::mock(Swift_Transport::class));
-        $transport->shouldReceive('stop');
-        $mailer->setSwiftMailer($swift);
+        $symfonyMailer = m::mock(SymfonyMailer::class);
+        $mailer->setSwiftMailer($symfonyMailer);
 
         return $mailer;
     }
 
-    protected function getMailer($events = null)
+    protected function getMailer($events = null): Mailer
     {
-        return new Mailer('smtp', m::mock(Swift_Mailer::class), ApplicationContext::getContainer());
+        return new Mailer('smtp', m::mock(SymfonyMailer::class), ApplicationContext::getContainer());
     }
 
-    protected function getMocks()
+    protected function getMocks(): array
     {
-        return ['smtp', m::mock(Swift_Mailer::class), ApplicationContext::getContainer()];
-    }
-}
-
-class FailingSwiftMailerStub extends Swift_Mailer
-{
-    public function send($message, &$failed = null)
-    {
-        $failed[] = 'eric@zhu.email';
-    }
-
-    public function getTransport()
-    {
-        $transport = m::mock(Swift_Transport::class);
-        $transport->shouldReceive('stop');
-
-        return $transport;
-    }
-
-    public function createMessage($service = 'message')
-    {
-        return new Swift_Message();
+        return ['smtp', m::mock(SymfonyMailer::class), ApplicationContext::getContainer()];
     }
 }

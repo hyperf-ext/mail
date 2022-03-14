@@ -10,29 +10,24 @@ declare(strict_types=1);
  */
 namespace HyperfExt\Mail\Events;
 
-use Swift_Attachment;
-use Swift_Message;
+use Symfony\Component\Mime\Email;
 
 class MailMessageSent
 {
     /**
      * The Swift message instance.
-     *
-     * @var \Swift_Message
      */
-    public $message;
+    public Email $message;
 
     /**
      * The message data.
-     *
-     * @var array
      */
-    public $data;
+    public array $data;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Swift_Message $message, array $data = [])
+    public function __construct(Email $message, array $data = [])
     {
         $this->data = $data;
         $this->message = $message;
@@ -40,14 +35,10 @@ class MailMessageSent
 
     /**
      * Get the serializable representation of the object.
-     *
-     * @return array
      */
-    public function __serialize()
+    public function __serialize(): array
     {
-        $hasAttachments = collect($this->message->getChildren())
-            ->whereInstanceOf(Swift_Attachment::class)
-            ->isNotEmpty();
+        $hasAttachments = ! empty($this->message->getAttachments());
 
         return $hasAttachments ? [
             'message' => base64_encode(serialize($this->message)),
@@ -63,7 +54,7 @@ class MailMessageSent
     /**
      * Marshal the object from its serialized data.
      */
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         if (isset($data['hasAttachments']) && $data['hasAttachments'] === true) {
             $this->message = unserialize(base64_decode($data['message']));

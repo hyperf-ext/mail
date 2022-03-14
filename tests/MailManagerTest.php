@@ -27,23 +27,13 @@ class MailManagerTest extends TestCase
 {
     public function testEmptyTransportConfig()
     {
-        $transport = '';
-
         $container = m::mock(ContainerInterface::class);
         $container->shouldReceive('get')->with(EventDispatcherInterface::class)->andReturn(m::mock());
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn(new Config([
             'mail' => [
                 'mailers' => [
                     'custom_smtp' => [
-                        'transport' => $transport,
-                        'options' => [
-                            'host' => null,
-                            'port' => null,
-                            'encryption' => null,
-                            'username' => null,
-                            'password' => null,
-                            'timeout' => null,
-                        ],
+                        'dsn' => '',
                     ],
                 ],
             ],

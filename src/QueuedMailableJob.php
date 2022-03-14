@@ -17,14 +17,8 @@ use HyperfExt\Mail\Contracts\MailManagerInterface;
 
 class QueuedMailableJob extends Job
 {
-    /**
-     * @var \HyperfExt\Mail\Contracts\MailableInterface
-     */
-    public $mailable;
-
-    public function __construct(MailableInterface $mailable)
+    public function __construct(public MailableInterface $mailable)
     {
-        $this->mailable = $mailable;
     }
 
     public function handle()
