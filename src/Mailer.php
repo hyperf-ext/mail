@@ -101,7 +101,7 @@ class Mailer implements MailerInterface
     /**
      * Set the global to address and name.
      */
-    public function astAlwaysTo(string $address, ?string $name = null): self
+    public function setAlwaysTo(string $address, ?string $name = null): self
     {
         $this->to = compact('address', 'name');
 
