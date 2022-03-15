@@ -75,7 +75,6 @@ return [
         ],
 
         'log' => [
-            'dsn' => 'log://',
             'transport' => \HyperfExt\Mail\Transport\LogTransport::class,
             'options' => [
                 'name' => 'mail.local',
