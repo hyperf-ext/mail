@@ -99,12 +99,12 @@ class MailManager implements MailManagerInterface
      */
     protected function createTransport(array $config): TransportInterface
     {
-        if (empty($config['dsn'])) {
-            throw new InvalidArgumentException('The mail transport DSN must be specified.');
+        if (!empty($config['transport'])) {
+            return make($config['transport'], ['options' => $config['options'] ?? []]);
         }
 
-        if ($config['dsn'] === 'log://') {
-            return make($config['transport'], ['options' => $config['options'] ?? []]);
+        if (empty($config['dsn'])) {
+            throw new InvalidArgumentException('The mail transport DSN must be specified.');
         }
 
         $logger = null;

@@ -493,7 +493,8 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
 
     protected function buildView(array $data): array
     {
-        Coroutine::create(function () use ($data, &$html, &$plain) {
+        $chan = new \Swoole\Coroutine\Channel(1);
+        Coroutine::create(function () use ($data, $chan) {
             if (! empty($this->locale)) {
                 ApplicationContext::getContainer()->get(TranslatorInterface::class)->setLocale($this->locale);
             }
@@ -511,9 +512,11 @@ abstract class Mailable implements MailableInterface, CompressInterface, UnCompr
             } elseif (! empty($this->textViewTemplate)) {
                 $plain = $this->renderView($this->textViewTemplate, $data);
             }
+
+            $chan->push([$html, $plain]);
         });
 
-        return [$html, $plain];
+        return $chan->pop();
     }
 
     /**
